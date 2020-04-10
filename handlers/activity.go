@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"time"
 )
 
 // Log is created to hold the individual lines of the log file
@@ -15,15 +14,6 @@ import (
 // inside the log file.
 type Log struct {
 	LogLines []string
-}
-
-var (
-	creds string
-	auth  string
-)
-
-func init() {
-	creds = strings.Join([]string{os.Getenv("UNAME"), os.Getenv("PWORD")}, ":")
 }
 
 // ActivityHandler is the primary route for /activity
@@ -68,15 +58,6 @@ func ActivityHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func loginPage(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("html/login.html")
-	if err != nil {
-		log.Println(err)
-	}
-
-	t.Execute(w, nil)
-}
-
 func logPage(w http.ResponseWriter, r *http.Request) {
 	var pLog Log
 
@@ -116,36 +97,4 @@ func findTop(lines []string) map[string]int {
 		}
 	}
 	return top
-}
-
-func checkCookie(r *http.Request) (bool, string) {
-	cook, _ := r.Cookie("X-Auth-Token")
-	if cook != nil {
-		return true, cook.Value
-	}
-	return false, ""
-
-}
-
-func setCookie(w http.ResponseWriter) {
-	expiration := time.Now().Add(1 * 24 * time.Hour)
-	cookie := http.Cookie{Name: "X-Auth-Token", Value: "plex-auth", Expires: expiration}
-	http.SetCookie(w, &cookie)
-}
-
-func unAuthorized(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusUnauthorized)
-	w.Write([]byte("You are not authorized to access this resource."))
-	log.Printf("Invalid Authorization Attempt! IP: %s", r.RemoteAddr)
-}
-
-func login(w http.ResponseWriter, r *http.Request) string {
-	err := r.ParseForm()
-	CheckErr(err)
-
-	user := r.FormValue("username")
-	pass := r.FormValue("password")
-	up := strings.Join([]string{user, pass}, ":")
-
-	return up
 }

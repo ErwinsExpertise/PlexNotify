@@ -17,17 +17,17 @@ Discord Webhook URL
 Username and Password
 
 **Example**
-	`export DISCORDURL=https://discordapp.com/api/webhooks/Token/Key`
-	`export UNAME=admin`
-	`export PWORD=password`
+`export DISCORDURL=https://discordapp.com/api/webhooks/Token/Key`
+`export UNAME=admin`
+`export PWORD=password`
 
 
-	```
+	
 	# Set environment variables
 	ENV DISCORDURL=https://discordapp.com/api/webhooks/Token/Key
 	ENV UNAME=admin
 	ENV PWORD=password
-	```
+	
 
 ## Plex
 
@@ -56,9 +56,11 @@ WORKDIR /app
 # Copy the source from the current directory to the Working Directory inside the container
 COPY . .
 
+# Add the current package to Go 
+ADD . /go/src/github.com/ErwinsExpertise/PlexNotify
+
 # Get needed dependcies
 RUN go get github.com/gorilla/mux
-RUN go get github.com/ErwinsExpertise/PlexNotify
 
 # Test the application
 RUN go test handlers/*
@@ -66,7 +68,7 @@ RUN go test handlers/*
 # Build the Go app
 RUN go build -o notify .
 
-# Expose port 8080 to the outside world
+# Expose port 9000 to the outside world
 EXPOSE 9000
 
 # Set environment variables
@@ -85,6 +87,8 @@ CMD ["./notify", "-port", "9000"]
 - [x] Accept incoming webhooks 
 - [x] Create an acitvity page
 - [x] Secure activity page with PP
+- [ ] Add search feature for activity
+- [ ] Create stand-alone login page
 - [ ] Implement option to use HTTPS with self-signed SSL
 - [ ] Add page for most played media
 - [ ] Implement better handling of non-media related payloads

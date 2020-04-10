@@ -1,18 +1,27 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io"
 	"log"
 	"net/http"
 	"os"
-
-	h "github.com/ErwinsExpertise/PlexNotify/handlers"
+	"os/signal"
+	"syscall"
 
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"github.com/ErwinsExpertise/PlexNotify/handlers"
 )
 
 var port string
+
+const (
+	POST = "POST"
+	GET  = "GET"
+)
 
 func init() {
 	flag.StringVar(&port, "port", "9000", "Port to be used")
@@ -34,10 +43,41 @@ func init() {
 }
 
 func main() {
+	ctx := context.Background()
+
+	ctx, cancel := context.WithCancel(ctx)
+
+	// Create channel of size 1
+	c := make(chan os.Signal, 1)
+
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	defer func() {
+		signal.Stop(c)
+		cancel()
+	}()
+
+	go func() {
+		select {
+		case <-c:
+			sig := <-c
+			log.Printf("Recieved %s signal. Shutting down server...\n", sig)
+			cancel()
+			os.Exit(0)
+		case <-ctx.Done():
+
+		}
+
+	}()
 
 	rout := mux.NewRouter()
-	rout.HandleFunc("/event", h.EventHandler).Methods("POST")
-	rout.HandleFunc("/activity", h.ActivityHandler).Methods("POST", "GET")
+
+	rout.HandleFunc("/event", handlers.EventHandler).Methods(POST)
+	rout.HandleFunc("/activity", handlers.ActivityHandler).Methods(POST, GET)
+	rout.HandleFunc("/login", handlers.LoginHandler).Methods(POST, GET)
+
+	// route for Prometheus metrics
+	rout.Handle("/metrics", promhttp.Handler())
 
 	log.Println("Now listening on: " + port)
 	log.Println(http.ListenAndServe(":"+port, rout))

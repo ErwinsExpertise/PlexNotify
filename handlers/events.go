@@ -10,6 +10,9 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/ErwinsExpertise/PlexNotify/metrics"
 )
 
 type EventInfo struct {
@@ -72,6 +75,7 @@ func init() {
 }
 
 func EventHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
 	var eventLoad EventInfo
 	defer r.Body.Close()
 
@@ -89,6 +93,8 @@ func EventHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+
+	metrics.EventCollector(time.Since(start).Milliseconds())
 
 	log.Printf("Processing event type: %s | User: %s | Title: %s | IP: %s", resp, eventLoad.Account.Title, eventLoad.CheckTitle(), eventLoad.Player.PublicAddress)
 	w.WriteHeader(200)
