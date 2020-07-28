@@ -26,13 +26,6 @@ type Event struct {
 	IP        string
 }
 
-func init() {
-	_, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
-	if err != nil {
-		log.Panic(err)
-	}
-}
-
 // ActivityHandler is the primary route for /activity
 // route accepts both GET and POST requests
 // This route is password protected to prevent indexing on search engines as well as
@@ -115,10 +108,10 @@ func AppendActivity(time, event, user, title, ip string) {
 	evJson, err := json.Marshal(&ev)
 	CheckErr(err)
 
-	f, err := os.OpenFile("activity.json", os.O_APPEND|os.O_WRONLY, 0666)
+	f, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	CheckErr(err)
-
+	defer f.Close()
 	_, err = io.WriteString(f, string(evJson))
 	CheckErr(err)
-
+	f.Close()
 }
