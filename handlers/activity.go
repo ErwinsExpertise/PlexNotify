@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -92,7 +93,7 @@ func activityPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func openActivityLog() *os.File {
-	fil, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	fil, err := os.Open("activity.json")
 	if err != nil {
 		log.Println(err)
 	}
@@ -118,9 +119,10 @@ func AppendActivity(time, event, user, title, ip string) {
 	evJson, err := json.Marshal(&ev)
 	CheckErr(err)
 
-	fil := openActivityLog()
+	f, err := os.OpenFile("activity.json", os.O_APPEND|os.O_WRONLY, 0666)
+	CheckErr(err)
 
-	_, err = fil.Write(evJson)
+	_, err = io.WriteString(f, string(evJson))
 	CheckErr(err)
 
 }
