@@ -92,7 +92,7 @@ func activityPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func openActivityLog() *os.File {
-	fil, err := os.Open("activity.json")
+	fil, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Println(err)
 	}
