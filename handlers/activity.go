@@ -26,15 +26,11 @@ type Event struct {
 	IP        string
 }
 
-var eventFile *os.File
-
 func init() {
-	eventFile, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	_, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Panic(err)
 	}
-
-	defer eventFile.Close()
 }
 
 // ActivityHandler is the primary route for /activity
