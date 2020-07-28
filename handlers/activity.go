@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"bufio"
+	"encoding/json"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,26 @@ import (
 // LogLines is a slice of type string and will hold the individual lines
 // inside the log file.
 type Log struct {
-	LogLines []string
+	Events []Event
+}
+
+type Event struct {
+	Timestamp string
+	Ev        string
+	User      string
+	Title     string
+	IP        string
+}
+
+var eventFile *os.File
+
+func init() {
+	eventFile, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	defer eventFile.Close()
 }
 
 // ActivityHandler is the primary route for /activity
@@ -58,10 +78,10 @@ func ActivityHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func logPage(w http.ResponseWriter, r *http.Request) {
+func activityPage(w http.ResponseWriter, r *http.Request) {
 	var pLog Log
 
-	pLog.buildLogs(openLogs())
+	pLog.buildActivities()
 
 	t, err := template.ParseFiles("html/activity.html")
 	if err != nil {
@@ -71,30 +91,36 @@ func logPage(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, &pLog)
 }
 
-func openLogs() *os.File {
-	fil, err := os.Open("/var/log/plexnotify/notify.log")
+func openActivityLog() *os.File {
+	fil, err := os.Open("activity.json")
 	if err != nil {
 		log.Println(err)
 	}
 	return fil
 }
 
-func (l *Log) buildLogs(fil *os.File) {
-	scanner := bufio.NewScanner(fil)
-
-	for scanner.Scan() {
-		l.LogLines = append(l.LogLines, scanner.Text())
-	}
+func (l *Log) buildActivities() {
+	evFile, err := ioutil.ReadFile("activity.json")
+	CheckErr(err)
+	json.Unmarshal(evFile, &l)
 }
 
-func findTop(lines []string) map[string]int {
-	top := make(map[string]int)
-	for _, lin := range lines {
-		if strings.Contains(lin, "media.play") {
-			tmp := strings.Split(lin, "|")
-			title := tmp[2][8:]
-			top[title]++
-		}
+func AppendActivity(time, event, user, title, ip string) {
+
+	ev := Event{
+		Timestamp: time,
+		Ev:        event,
+		User:      user,
+		Title:     title,
+		IP:        ip,
 	}
-	return top
+
+	evJson, err := json.Marshal(&ev)
+	CheckErr(err)
+
+	fil := openActivityLog()
+
+	_, err = fil.Write(evJson)
+	CheckErr(err)
+
 }

@@ -65,7 +65,7 @@ func main() {
 			cancel()
 			os.Exit(0)
 		case <-ctx.Done():
-
+			// consume
 		}
 
 	}()
