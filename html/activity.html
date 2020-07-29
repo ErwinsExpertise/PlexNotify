@@ -27,12 +27,6 @@
         </div>
       </div>
       <h1 class="display-4">Logs</h1>
-      <ul class="list-group">
-        {{range .Events}}
-        <li class="list-group-item">{{.}}</li>
-        {{end}}
-      </ul>
-
       <table class="table table-hover">
         <thead>
           <tr>
@@ -46,11 +40,11 @@
         <tbody>
           {{range .Events}}
           <tr>
-            <th scope="row">{{.Event.Timestamp}}</th>
-            <td>{{.Event.Ev}}</td>
-            <td>{{.Event.User}}</td>
-            <td>{{.Event.Title}}</td>
-            <td>{{.Event.IP}}</td>
+            <th scope="row">{{.Timestamp}}</th>
+            <td>{{.Ev}}</td>
+            <td>{{.User}}</td>
+            <td>{{.Title}}</td>
+            <td>{{.IP}}</td>
           </tr>
           {{end}}
         </tbody>

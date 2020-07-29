@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -24,6 +23,11 @@ type Event struct {
 	User      string
 	Title     string
 	IP        string
+}
+
+func init() {
+	_, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	CheckErr(err)
 }
 
 // ActivityHandler is the primary route for /activity
@@ -51,7 +55,7 @@ func ActivityHandler(w http.ResponseWriter, r *http.Request) {
 		bo, val := checkCookie(r)
 		if bo == true {
 			if strings.Compare(val, "plex-auth") == 0 {
-				logPage(w, r)
+				activityPage(w, r)
 				return
 			}
 			loginPage(w, r)
@@ -90,9 +94,23 @@ func openActivityLog() *os.File {
 }
 
 func (l *Log) buildActivities() {
-	evFile, err := ioutil.ReadFile("activity.json")
+	evFile, err := os.Open("activity.json")
 	CheckErr(err)
-	json.Unmarshal(evFile, &l)
+
+	d := json.NewDecoder(evFile)
+	var eventLog Log
+
+	for {
+		var ev Event
+		if err := d.Decode(&ev); err == io.EOF {
+			break
+		} else if err != nil {
+			CheckErr(err)
+		}
+		eventLog.Events = append(eventLog.Events, ev)
+
+	}
+	*l = eventLog
 }
 
 func AppendActivity(time, event, user, title, ip string) {
@@ -105,13 +123,12 @@ func AppendActivity(time, event, user, title, ip string) {
 		IP:        ip,
 	}
 
-	evJson, err := json.Marshal(&ev)
-	CheckErr(err)
-
 	f, err := os.OpenFile("activity.json", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	CheckErr(err)
 	defer f.Close()
-	_, err = io.WriteString(f, string(evJson))
+
+	err = json.NewEncoder(f).Encode(ev)
 	CheckErr(err)
+
 	f.Close()
 }
