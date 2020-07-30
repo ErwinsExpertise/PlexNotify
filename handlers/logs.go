@@ -13,6 +13,8 @@ type Logs struct {
 	LogLines []string
 }
 
+var logPath string
+
 // ActivityHandler is the primary route for /activity
 // route accepts both GET and POST requests
 // This route is password protected to prevent indexing on search engines as well as
@@ -69,7 +71,7 @@ func logPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func openLogs() *os.File {
-	fil, err := os.Open("/var/log/plexnotify/notify.log")
+	fil, err := os.Open(logPath + "notify.log")
 	if err != nil {
 		log.Println(err)
 	}
@@ -82,4 +84,18 @@ func (l *Logs) buildLogs(fil *os.File) {
 	for scanner.Scan() {
 		l.LogLines = append(l.LogLines, scanner.Text())
 	}
+}
+
+func CreateLogs() string {
+	if _, err := os.Stat("/var/log/plexnotify"); os.IsNotExist(err) {
+		err := os.Mkdir("/var/log/plexnotify", 0755)
+		if err != nil {
+			logPath = ""
+		} else {
+			logPath = "/var/log/plexnotify/"
+		}
+	}
+
+	return logPath
+
 }
