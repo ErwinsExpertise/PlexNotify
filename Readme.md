@@ -6,7 +6,7 @@ PlexNotify is a webhook client that listens for events from a Plex media server.
 
 ## Environment
 
-- GO 1.14+
+- GO 1.12+
 
 ### Dependecies
 
