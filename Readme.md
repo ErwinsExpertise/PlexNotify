@@ -17,11 +17,13 @@ Discord Webhook URL
 Username and Password
 
 **Example**
-`export DISCORDURL=https://discordapp.com/api/webhooks/Token/Key`
-`export UNAME=admin`
-`export PWORD=password`
+	Exporting environment variables on Linux:
 
+	export DISCORDURL=https://discordapp.com/api/webhooks/Token/Key
+	export UNAME=admin
+	export PWORD=password
 
+	Exporting environment variables in Dockerfile:
 	
 	# Set environment variables
 	ENV DISCORDURL=https://discordapp.com/api/webhooks/Token/Key
@@ -59,15 +61,11 @@ COPY . .
 # Add the current package to Go 
 ADD . /go/src/github.com/ErwinsExpertise/PlexNotify
 
-# Get needed dependcies
-RUN go get github.com/gorilla/mux
-RUN go get github.com/prometheus/client_golang/prometheus
+# Build the Go app
+RUN go build -o notify .
 
 # Test the application
 RUN go test handlers/*
-
-# Build the Go app
-RUN go build -o notify .
 
 # Expose port 9000 to the outside world
 EXPOSE 9000
