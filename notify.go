@@ -27,14 +27,18 @@ func init() {
 	flag.StringVar(&port, "port", "9000", "Port to be used")
 	flag.Parse()
 
+	var logPath string
+
 	if _, err := os.Stat("/var/log/plexnotify"); os.IsNotExist(err) {
 		err := os.Mkdir("/var/log/plexnotify", 0755)
 		if err != nil {
-			log.Panic(err)
+			logPath = ""
+		} else {
+			logPath = "/var/log/plexnotify/"
 		}
 	}
 
-	logFile, err := os.OpenFile("/var/log/plexnotify/notify.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
+	logFile, err := os.OpenFile(logPath+"notify.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0644)
 	if err != nil {
 		log.Panic(err)
 	}
