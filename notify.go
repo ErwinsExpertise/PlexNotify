@@ -80,6 +80,7 @@ func main() {
 	rout.HandleFunc("/activity", handlers.ActivityHandler).Methods(POST, GET)
 	rout.HandleFunc("/logs", handlers.LogHandler).Methods(POST, GET)
 	rout.HandleFunc("/login", handlers.LoginHandler).Methods(POST, GET)
+	rout.HandleFunc("/", handlers.ActivityHandler).Methods(POST, GET)
 
 	// route for Prometheus metrics
 	rout.Handle("/metrics", promhttp.Handler())
