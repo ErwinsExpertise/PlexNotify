@@ -9,6 +9,10 @@ import (
 	"strings"
 )
 
+type Logs struct {
+	LogLines []string
+}
+
 // ActivityHandler is the primary route for /activity
 // route accepts both GET and POST requests
 // This route is password protected to prevent indexing on search engines as well as
@@ -52,11 +56,11 @@ func LogHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func logPage(w http.ResponseWriter, r *http.Request) {
-	var pLog Log
+	var pLog Logs
 
 	pLog.buildLogs(openLogs())
 
-	t, err := template.ParseFiles("html/activity.html")
+	t, err := template.ParseFiles("html/log.html")
 	if err != nil {
 		log.Println(err)
 	}
@@ -72,10 +76,10 @@ func openLogs() *os.File {
 	return fil
 }
 
-func (l *Log) buildLogs(fil *os.File) {
+func (l *Logs) buildLogs(fil *os.File) {
 	scanner := bufio.NewScanner(fil)
 
 	for scanner.Scan() {
-
+		l.LogLines = append(l.LogLines, scanner.Text())
 	}
 }

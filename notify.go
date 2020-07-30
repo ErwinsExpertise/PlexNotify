@@ -74,6 +74,7 @@ func main() {
 
 	rout.HandleFunc("/event", handlers.EventHandler).Methods(POST)
 	rout.HandleFunc("/activity", handlers.ActivityHandler).Methods(POST, GET)
+	rout.HandleFunc("/logs", handlers.ActivityHandler).Methods(POST, GET)
 	rout.HandleFunc("/login", handlers.LoginHandler).Methods(POST, GET)
 
 	// route for Prometheus metrics

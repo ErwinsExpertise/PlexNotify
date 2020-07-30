@@ -61,6 +61,7 @@ ADD . /go/src/github.com/ErwinsExpertise/PlexNotify
 
 # Get needed dependcies
 RUN go get github.com/gorilla/mux
+RUN go get github.com/prometheus/client_golang/prometheus
 
 # Test the application
 RUN go test handlers/*
