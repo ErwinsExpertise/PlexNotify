@@ -17,6 +17,8 @@ Discord Webhook URL
 Username and Password
 
 **Example**
+Exporting environment variables:
+
 	Exporting environment variables on Linux:
 
 	export DISCORDURL=https://discordapp.com/api/webhooks/Token/Key

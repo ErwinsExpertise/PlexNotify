@@ -93,8 +93,11 @@ func EventHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(500)
 		return
 	}
+	since := time.Since(start).Nanoseconds()
 
-	metrics.EventCollector(int64(time.Since(start) / 1000000))
+	elapsed := since / 1000000
+
+	metrics.EventCollector(elapsed)
 
 	log.Printf("Processing event type: %s | User: %s | Title: %s | IP: %s", resp, eventLoad.Account.Title, eventLoad.CheckTitle(), eventLoad.Player.PublicAddress)
 	AppendActivity(time.Now().Format("2006-01-02 15:04:05"), resp, eventLoad.Account.Title, eventLoad.CheckTitle(), eventLoad.Player.PublicAddress)
