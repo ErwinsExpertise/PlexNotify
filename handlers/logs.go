@@ -15,7 +15,7 @@ type Logs struct {
 
 var logPath string
 
-// ActivityHandler is the primary route for /activity
+// LogHandler is the primary route for /logs
 // route accepts both GET and POST requests
 // This route is password protected to prevent indexing on search engines as well as
 // preventing data leaks to scaping bots.
