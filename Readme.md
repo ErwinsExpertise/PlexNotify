@@ -89,6 +89,7 @@ CMD ["./notify", "-port", "9000"]
 - [x] Create an acitvity page
 - [x] Secure activity page with PP
 - [ ] Add search feature for activity
+- [ ] Store historical data in MongoDB
 - [ ] Create stand-alone login page
 - [ ] Implement option to use HTTPS with self-signed SSL
 - [ ] Add page for most played media
