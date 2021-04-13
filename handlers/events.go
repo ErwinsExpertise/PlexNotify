@@ -174,6 +174,9 @@ func (e *EventInfo) SendHook(content string) {
 		log.Println(err)
 		log.Printf("RequestBody: %v\n", string(requestBody))
 	}
+
+	sendSMTP(content)
+
 }
 
 func (e *EventInfo) BuildPayload(content string) Payload {
